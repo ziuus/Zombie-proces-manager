@@ -1,63 +1,55 @@
 # Orphan Process Manager (OPM)
 
-A high-performance, lightweight terminal utility built in Rust to detect, monitor, and manage orphaned background processes that drain system resources.
+A high-performance, lightweight terminal utility built in Rust to detect, monitor, manage orphaned background processes, and **launch & track your own apps**.
 
-## 📋 Overview
+## Features
 
-Modern development environments often leave behind "zombie" or orphaned processes—Node servers, headless browsers, and build tools—that continue to consume CPU and RAM long after their parent application (IDE or Terminal) has closed. 
+- **🧟 Orphan Detection** — Finds processes reparented to PID 1 that match common dev tool patterns (Node.js, Python, Chrome, etc.)
+- **🚀 App Launcher** — Press `a`, type any shell command, and OPM spawns it and tracks its entire process tree
+- **📡 Port Mapping** — Identifies which processes are holding local TCP ports — no more "Address already in use" mysteries
+- **📊 Resource Monitoring** — Real-time memory usage tracking, sorted by consumption
+- **👁️ View Modes** — Toggle between orphan processes only, tracked processes only, or all processes with `Tab`
+- **💀 Interactive Reaper** — Kill processes individually with `x`/`Enter`; tracked root processes kill their children too
+- **🟢 Visual Distinction** — Tracked processes shown in green, orphans in yellow, root tracked processes in bold green
+- **🦀 Zero-Bloat** — Built with Rust and `ratatui` — single binary, minimal footprint
 
-OPM provides a real-time dashboard to identify these leaks and reclaim your system resources with a single keystroke.
-
-## ✨ Features
-
-- **Intelligent Detection**: Specifically targets orphaned processes reparented to PID 1 that match common development patterns (Node.js, Python, Chrome, etc.).
-- **Network Port Mapping**: Automatically identifies which processes are holding local TCP ports, helping resolve "Address already in use" errors.
-- **Resource Monitoring**: Real-time tracking of memory usage for every detected process.
-- **Interactive Reaper**: A clean TUI (Terminal User Interface) to safely terminate processes individually.
-- **Zero-Bloat**: Built with Rust and `ratatui` for minimal footprint and maximum performance.
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- [Rust](https://www.rust-lang.org/tools/install) (latest stable version)
-- Linux (optimized for `/proc` based process inspection)
-
-### Installation
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/opm.git
-   cd opm
-   ```
-
-2. Build the project:
-   ```bash
-   cargo build --release
-   ```
-
-3. Run the application:
-   ```bash
-   ./target/release/opm
-   ```
-
-## 🎮 Controls
+## Controls
 
 | Key | Action |
 |-----|--------|
+| `a` | Launch a new app/command |
+| `Tab` | Cycle view mode (ORPHANS → ALL PROCS → TRACKED) |
 | `k` / `↑` | Move selection up |
 | `j` / `↓` | Move selection down |
-| `x` / `Enter` | Terminate selected process |
+| `x` / `Enter` | Terminate selected process (kills children for tracked roots) |
 | `r` | Manual refresh |
 | `q` / `Esc` | Exit application |
 
-## 🛠️ Technology Stack
+When in launch input mode (`a`):
+- Type any shell command (supports pipes, redirects, etc.)
+- `Enter` to launch, `Esc` to cancel
 
-- **Core**: Rust
-- **TUI Framework**: [Ratatui](https://github.com/ratatui/ratatui)
-- **Process Inspection**: `sysinfo` and `procfs`
-- **Terminal Backend**: `crossterm`
+## Getting Started
 
-## 📄 License
+### Prerequisites
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+- [Rust](https://www.rust-lang.org/tools/install) (latest stable)
+- Linux (uses `/proc` based process inspection)
+
+### Build & Run
+
+```bash
+git clone https://github.com/ziuus/Zombie-proces-manager.git
+cd Zombie-proces-manager
+cargo run --release
+```
+
+## Tech Stack
+
+- **Core:** Rust
+- **TUI:** [Ratatui](https://github.com/ratatui/ratatui) + [Crossterm](https://github.com/crossterm-rs/crossterm)
+- **Process Inspection:** `sysinfo` + `procfs`
+
+## License
+
+MIT

@@ -5,8 +5,6 @@ edition = "2024"
 
 [dependencies]
 anyhow = "1.0.102"
-chrono = "0.4.45"
-clap = "4.6.1"
 crossterm = "0.29.0"
 procfs = "0.18.0"
 ratatui = "0.30.1"
