@@ -68,6 +68,7 @@ struct ProcessInfo {
 struct TrackedEntry {
     pid: u32,
     label: String,
+    #[allow(dead_code)]
     launched_at: Instant,
     children: HashSet<u32>,
 }
@@ -100,10 +101,8 @@ fn all_descendants(system: &System, root_pid: u32) -> HashSet<u32> {
     let mut set = HashSet::new();
     let mut stack = vec![root_pid];
     while let Some(pid) = stack.pop() {
-        if set.insert(pid) {
-            if let Some(kids) = children.get(&pid) {
-                stack.extend(kids);
-            }
+        if set.insert(pid) && let Some(kids) = children.get(&pid) {
+            stack.extend(kids);
         }
     }
     set.remove(&root_pid);
@@ -320,7 +319,7 @@ impl App {
             return;
         }
         let i = match self.state.selected() {
-            Some(i) if i == 0 => self.items.len() - 1,
+            Some(0) => self.items.len() - 1,
             Some(i) => i - 1,
             None => 0,
         };
@@ -501,10 +500,10 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> Result<()> {
         }
 
         // Clear status messages after 8s
-        if let Some((_, at)) = &app.status_msg {
-            if at.elapsed() > Duration::from_secs(8) {
-                app.status_msg = None;
-            }
+        if let Some((_, at)) = &app.status_msg
+            && at.elapsed() > Duration::from_secs(8)
+        {
+            app.status_msg = None;
         }
 
         if !event::poll(Duration::from_millis(200)).context("event poll")? {
