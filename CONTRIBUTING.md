@@ -1,21 +1,47 @@
-# Contributing to OPM
+# Contributing to ziuus Projects
 
-Thank you for your interest in improving the Orphan Process Manager! We welcome contributions from the community.
+Thank you for your interest in contributing! We welcome contributions from the community.
 
-## 🛠️ How to Contribute
+## Code of Conduct
+This project adheres to a code of conduct. Please be respectful and inclusive.
 
-1.  **Find an Issue**: Look for open issues or create a new one to discuss a feature or bug.
-2.  **Fork the Repo**: Create your own copy of the repository.
-3.  **Create a Branch**: `git checkout -b feature/your-feature-name`.
-4.  **Make Changes**: Ensure your code follows Rust best practices and is well-documented.
-5.  **Submit a PR**: Open a Pull Request with a clear description of your changes.
+## Getting Started
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## 📜 Development Guidelines
+## Development Setup
+```bash
+# Clone your fork
+git clone https://github.com/yourusername/project.git
+cd project
 
-- **Style**: Use `cargo fmt` before committing.
-- **Safety**: Avoid `unsafe` blocks unless absolutely necessary for system-level calls.
-- **Performance**: Keep the resource footprint small; OPM is a utility meant to *save* resources.
+# Install dependencies
+npm install
 
-## 🤝 Code of Conduct
+# Run development server
+npm run dev
 
-Please be respectful and professional in all interactions within this project.
+# Run tests
+npm test
+```
+
+## Project-Specific Guidelines
+- See project README for specific requirements
+- Follow existing code style and conventions
+- Write tests for new features
+- Update documentation as needed
+
+## Pull Request Guidelines
+- Ensure tests pass
+- Update documentation
+- Add comments for complex code
+- Reference related issues
+
+## Questions?
+Open an issue or contact the maintainers.
+
+## License
+By contributing, you agree that your contributions will be licensed under the MIT License.
