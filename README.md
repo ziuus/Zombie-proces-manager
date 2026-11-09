@@ -2,6 +2,11 @@
 
 A high-performance, lightweight terminal utility built in Rust to detect, monitor, manage orphaned background processes, and **launch & track your own apps**.
 
+> Building this in the open — if it saves you time, a star helps others find it.
+> Found a bug, or have an idea? [Open an issue](https://github.com/ziuus/Zombie-proces-manager/issues).
+> New here? Start with a [good first issue](https://github.com/ziuus/Zombie-proces-manager/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).
+> New process patterns and distro bug reports welcome.
+
 ## Features
 
 - **🧟 Orphan Detection** — Finds processes reparented to PID 1 that match common dev tool patterns (Node.js, Python, Chrome, etc.)
