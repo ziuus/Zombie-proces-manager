@@ -19,6 +19,9 @@ use std::{
 };
 use sysinfo::{Pid, Signal, System};
 
+mod config;
+use config::Config;
+
 // ─── Modes ────────────────────────────────────────────────────────────
 
 #[derive(Clone, Copy, PartialEq)]
@@ -86,6 +89,8 @@ struct App {
     launch_input: String,
     tracked: Vec<TrackedEntry>,
     status_msg: Option<(String, Instant)>,
+    config: Config,
+    resolved_filters: Vec<String>,
 }
 
 // ─── helpers ──────────────────────────────────────────────────────────
@@ -113,9 +118,11 @@ fn all_descendants(system: &System, root_pid: u32) -> HashSet<u32> {
 
 impl App {
     fn new() -> App {
+        let load_res = Config::load();
+        let resolved_filters = load_res.config.resolved_suspicious_names();
         let mut system = System::new_all();
         system.refresh_all();
-        App {
+        let mut app = App {
             state: ListState::default(),
             items: Vec::new(),
             system,
@@ -126,7 +133,19 @@ impl App {
             launch_input: String::new(),
             tracked: Vec::new(),
             status_msg: None,
+            config: load_res.config,
+            resolved_filters,
+        };
+        if let Some(warn) = load_res.warning {
+            app.set_status(warn);
+        } else if let Some(source) = load_res.source {
+            app.set_status(format!(
+                "loaded config from {} ({} filters)",
+                source.display(),
+                app.resolved_filters.len()
+            ));
         }
+        app
     }
 
     fn set_status(&mut self, msg: impl Into<String>) {
@@ -154,20 +173,17 @@ impl App {
             tracked_set.extend(&entry.children);
         }
 
-        // Suspicious orphan names
-        let suspicious_names = [
-            "node", "python", "ruby", "java", "chrome", "chromium", "brave",
-            "esbuild", "vite", "next-server", "webpack", "docker", "rustc",
-        ];
-
         let mut all_procs: Vec<ProcessInfo> = Vec::new();
 
         for (pid, process) in self.system.processes() {
             let pid_u32 = pid.as_u32();
             let ppid = process.parent().map(|p| p.as_u32()).unwrap_or(0);
             let name = process.name().to_string_lossy().to_lowercase();
-            let is_orphan =
-                ppid == 1 && suspicious_names.iter().any(|&s| name.contains(s));
+            let is_orphan = ppid == 1
+                && self
+                    .resolved_filters
+                    .iter()
+                    .any(|s| !s.is_empty() && name.contains(s));
 
             let is_tracked = tracked_set.contains(&pid_u32);
 
@@ -422,8 +438,12 @@ fn ui(f: &mut Frame, app: &mut App) {
         })
         .collect();
 
+    let orphan_title = format!(
+        " Orphaned Background Processes ({} filters) ",
+        app.resolved_filters.len()
+    );
     let title = match app.view_mode {
-        ViewMode::Orphans => " Orphaned Background Processes ",
+        ViewMode::Orphans => orphan_title.as_str(),
         ViewMode::All => " All Processes ",
         ViewMode::Tracked => " Tracked Processes ",
     };
@@ -551,9 +571,22 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> Result<()> {
                 KeyCode::Down | KeyCode::Char('j') => app.next(),
                 KeyCode::Up | KeyCode::Char('k') => app.previous(),
                 KeyCode::Char('r') => {
+                    let load_res = Config::load();
+                    app.config = load_res.config;
+                    app.resolved_filters = app.config.resolved_suspicious_names();
                     app.remove_dead_tracked();
                     app.refresh_data();
-                    app.set_status("refreshed");
+                    if let Some(warn) = load_res.warning {
+                        app.set_status(warn);
+                    } else if let Some(source) = load_res.source {
+                        app.set_status(format!(
+                            "reloaded config from {} ({} filters)",
+                            source.display(),
+                            app.resolved_filters.len()
+                        ));
+                    } else {
+                        app.set_status(format!("refreshed ({} filters)", app.resolved_filters.len()));
+                    }
                 }
                 KeyCode::Enter | KeyCode::Char('x') => app.kill_selected(),
                 _ => {}
